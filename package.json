@@ -1,15 +1,23 @@
 {
   "name": "betteringest",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Zero-dependency CLI to bulk-ingest files into a knowledge graph. Chat-aware chunking, LLM extraction, force-directed visualization.",
   "type": "module",
   "bin": {
-    "betteringest": "./bin/betteringest"
+    "betteringest": "bin/betteringest"
   },
-  "keywords": ["knowledge-graph", "rag", "ingestion", "llm", "cli", "graph", "extraction"],
+  "keywords": [
+    "knowledge-graph",
+    "rag",
+    "ingestion",
+    "llm",
+    "cli",
+    "graph",
+    "extraction"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/myles-david/betteringest"
+    "url": "git+https://github.com/myles-david/betteringest.git"
   },
   "author": "Myles David",
   "license": "MIT",
