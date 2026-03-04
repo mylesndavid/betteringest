@@ -9,8 +9,6 @@
     --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3;
     --dim: #8b949e; --accent: #58a6ff; --green: #3fb950; --red: #f85149;
     --orange: #d29922; --purple: #bc8cff;
-    --entity: #58a6ff; --person: #d2a8ff; --fact: #3fb950; --decision: #d29922;
-    --document: #8b949e; --preference: #bc8cff; --frustration: #f85149;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
@@ -24,32 +22,25 @@
 
   .layout { display: flex; flex: 1; overflow: hidden; }
 
-  .sidebar { width: 340px; min-width: 300px; border-right: 1px solid var(--border); display: flex; flex-direction: column; background: var(--surface); flex-shrink: 0; }
+  /* Left sidebar */
+  .sidebar { width: 300px; min-width: 280px; border-right: 1px solid var(--border); display: flex; flex-direction: column; background: var(--surface); flex-shrink: 0; }
+  .panel { padding: 14px; border-bottom: 1px solid var(--border); }
+  .panel h2 { font-size: 11px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
 
-  .panel { padding: 16px; border-bottom: 1px solid var(--border); }
-  .panel h2 { font-size: 13px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
-
-  .drop-zone {
-    border: 2px dashed var(--border); border-radius: 8px; padding: 24px; text-align: center;
-    color: var(--dim); cursor: pointer; transition: all 0.15s;
-    font-size: 13px;
-  }
+  .drop-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 20px; text-align: center; color: var(--dim); cursor: pointer; transition: all 0.15s; font-size: 13px; }
   .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); color: var(--accent); background: rgba(88,166,255,0.05); }
   .drop-zone input { display: none; }
 
-  .file-list { margin-top: 10px; max-height: 120px; overflow-y: auto; }
-  .file-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; font-size: 12px; border-radius: 4px; background: var(--bg); margin-top: 4px; }
-  .file-item .name { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+  .file-list { margin-top: 8px; max-height: 100px; overflow-y: auto; }
+  .file-item { display: flex; justify-content: space-between; padding: 3px 8px; font-size: 11px; border-radius: 4px; background: var(--bg); margin-top: 3px; }
+  .file-item .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px; }
   .file-item .size { color: var(--dim); flex-shrink: 0; margin-left: 8px; }
 
-  .raw-input { width: 100%; height: 80px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 8px; font-size: 12px; font-family: 'SF Mono', Monaco, monospace; resize: vertical; }
+  .raw-input { width: 100%; height: 60px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 8px; font-size: 11px; font-family: 'SF Mono', Monaco, monospace; resize: vertical; }
   .raw-input:focus { outline: none; border-color: var(--accent); }
 
-  .actions { display: flex; gap: 8px; margin-top: 10px; }
-  button {
-    padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface);
-    color: var(--text); font-size: 13px; cursor: pointer; transition: all 0.15s; font-weight: 500;
-  }
+  .actions { display: flex; gap: 8px; margin-top: 8px; }
+  button { padding: 7px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 12px; cursor: pointer; transition: all 0.15s; font-weight: 500; }
   button:hover { background: var(--border); }
   button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
   button.primary:hover { background: #4c8fd8; }
@@ -57,55 +48,58 @@
   button.danger { color: var(--red); border-color: var(--red); }
   button.danger:hover { background: rgba(248,81,73,0.1); }
 
-  .progress-bar { width: 100%; height: 4px; background: var(--bg); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  .progress-bar { width: 100%; height: 3px; background: var(--bg); border-radius: 2px; margin-top: 6px; overflow: hidden; }
   .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; }
 
-  .log-area {
-    flex: 1; overflow-y: auto; padding: 10px 16px; font-size: 11px; font-family: 'SF Mono', Monaco, monospace;
-    color: var(--dim); line-height: 1.6;
-  }
+  .filter-bar { display: flex; gap: 4px; flex-wrap: wrap; }
+  .filter-chip { padding: 2px 7px; font-size: 10px; border-radius: 10px; cursor: pointer; border: 1px solid var(--border); background: var(--bg); color: var(--dim); transition: all 0.15s; user-select: none; }
+  .filter-chip.active { border-color: var(--accent); color: var(--accent); background: rgba(88,166,255,0.1); }
+
+  .log-area { flex: 1; overflow-y: auto; padding: 8px 14px; font-size: 10px; font-family: 'SF Mono', Monaco, monospace; color: var(--dim); line-height: 1.5; }
   .log-area .log-line { white-space: pre-wrap; word-break: break-all; }
 
-  /* Graph area */
+  /* Graph canvas */
   .graph-area { flex: 1; position: relative; overflow: hidden; }
   canvas { display: block; width: 100%; height: 100%; }
 
-  .graph-controls {
-    position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; z-index: 10;
-  }
-  .graph-controls button { padding: 6px 10px; font-size: 11px; background: var(--surface); }
+  .graph-controls { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; z-index: 10; }
+  .graph-controls button { padding: 5px 10px; font-size: 11px; background: var(--surface); }
 
-  .graph-legend {
-    position: absolute; bottom: 12px; left: 12px; display: flex; gap: 12px; z-index: 10;
-    font-size: 11px; color: var(--dim); background: rgba(22,27,34,0.9); padding: 8px 12px;
-    border-radius: 6px; border: 1px solid var(--border);
-  }
-  .legend-item { display: flex; align-items: center; gap: 4px; }
-  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .graph-legend { position: absolute; bottom: 12px; left: 12px; display: flex; gap: 10px; z-index: 10; font-size: 10px; color: var(--dim); background: rgba(22,27,34,0.9); padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); }
+  .legend-item { display: flex; align-items: center; gap: 3px; }
+  .legend-dot { width: 7px; height: 7px; border-radius: 50%; }
 
-  .node-tooltip {
-    position: absolute; display: none; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 6px; padding: 10px 14px; font-size: 12px; max-width: 320px; z-index: 20;
-    pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  }
-  .node-tooltip .tt-type { font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px; }
-  .node-tooltip .tt-name { font-weight: 600; margin-top: 2px; }
-  .node-tooltip .tt-detail { color: var(--dim); margin-top: 4px; font-size: 11px; }
+  .stats-bar { position: absolute; top: 12px; left: 12px; font-size: 11px; color: var(--dim); background: rgba(22,27,34,0.9); padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); z-index: 10; }
 
-  .stats-bar {
-    position: absolute; top: 12px; left: 12px; font-size: 11px; color: var(--dim);
-    background: rgba(22,27,34,0.9); padding: 6px 10px; border-radius: 6px;
-    border: 1px solid var(--border); z-index: 10;
+  /* Right detail panel */
+  .detail-panel {
+    width: 320px; min-width: 300px; border-left: 1px solid var(--border); background: var(--surface);
+    display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0;
+    transition: width 0.2s;
   }
+  .detail-panel.collapsed { width: 0; min-width: 0; overflow: hidden; border: none; }
 
-  /* Filter bar */
-  .filter-bar { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
-  .filter-chip {
-    padding: 3px 8px; font-size: 11px; border-radius: 10px; cursor: pointer;
-    border: 1px solid var(--border); background: var(--bg); color: var(--dim);
-    transition: all 0.15s; user-select: none;
+  .detail-header { padding: 14px; border-bottom: 1px solid var(--border); }
+  .detail-header .type-badge { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; }
+  .detail-header .node-name { font-size: 16px; font-weight: 600; line-height: 1.3; }
+  .detail-header .node-meta { font-size: 11px; color: var(--dim); margin-top: 4px; }
+
+  .detail-section { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  .detail-section h3 { font-size: 11px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+
+  .edge-item {
+    display: flex; align-items: center; gap: 8px; padding: 6px 8px; margin-bottom: 4px;
+    background: var(--bg); border-radius: 6px; font-size: 12px; cursor: pointer;
+    transition: background 0.15s;
   }
-  .filter-chip.active { border-color: var(--accent); color: var(--accent); background: rgba(88,166,255,0.1); }
+  .edge-item:hover { background: var(--border); }
+  .edge-type { font-size: 9px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px; background: rgba(88,166,255,0.1); padding: 1px 5px; border-radius: 3px; flex-shrink: 0; }
+  .edge-target { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .edge-dir { color: var(--dim); font-size: 10px; flex-shrink: 0; }
+
+  .detail-text { font-size: 12px; line-height: 1.5; color: var(--text); }
+  .detail-aliases { font-size: 11px; color: var(--dim); }
+  .detail-empty { font-size: 12px; color: var(--dim); padding: 40px 14px; text-align: center; }
 </style>
 </head>
 <body>
@@ -120,28 +114,21 @@
     <div class="panel">
       <h2>Sources</h2>
       <div id="dropZone" class="drop-zone">
-        Drop files here or click to browse
-        <br><span style="font-size:11px; margin-top:4px; display:inline-block">.zip, .md, .txt, .json, .csv, directories</span>
+        Drop files or click to browse
         <input type="file" id="fileInput" multiple>
       </div>
       <div id="fileList" class="file-list"></div>
-      <div style="margin-top: 10px;">
-        <textarea id="rawText" class="raw-input" placeholder="Or paste raw text here..."></textarea>
-      </div>
+      <div style="margin-top:8px"><textarea id="rawText" class="raw-input" placeholder="Or paste raw text..."></textarea></div>
       <div class="actions">
         <button id="runBtn" class="primary" onclick="runIngest()">Run</button>
         <button onclick="clearAll()" class="danger">Clear</button>
       </div>
-      <div class="progress-bar" id="progressBar" style="display:none">
-        <div class="progress-fill" id="progressFill" style="width:0%"></div>
-      </div>
+      <div class="progress-bar" id="progressBar" style="display:none"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
     </div>
-
     <div class="panel" style="padding-bottom:8px">
       <h2>Filter</h2>
       <div class="filter-bar" id="filterBar"></div>
     </div>
-
     <div class="log-area" id="logArea"></div>
   </div>
 
@@ -153,7 +140,10 @@
       <button onclick="refreshGraph()">Refresh</button>
     </div>
     <div class="graph-legend" id="legend"></div>
-    <div class="node-tooltip" id="tooltip"></div>
+  </div>
+
+  <div class="detail-panel collapsed" id="detailPanel">
+    <div id="detailContent"><div class="detail-empty">Click a node to see details</div></div>
   </div>
 </div>
 
@@ -165,28 +155,22 @@ let simNodes = [];
 let simEdges = [];
 let activeFilters = new Set(['entity','person','fact','decision','preference','frustration','document']);
 let pollingId = null;
+let selectedNode = null;
 
-// ── Colors ─────────────────────────────────────────────────
 const TYPE_COLORS = {
   entity: '#58a6ff', person: '#d2a8ff', fact: '#3fb950', decision: '#d29922',
   document: '#8b949e', preference: '#bc8cff', frustration: '#f85149',
   session: '#6e7681', memory: '#79c0ff',
 };
-const TYPE_RADIUS = {
-  entity: 8, person: 7, fact: 5, decision: 6, preference: 5, frustration: 5, document: 6,
-};
+const TYPE_RADIUS = { entity: 10, person: 9, fact: 5, decision: 6, preference: 5, frustration: 5, document: 7 };
 
 // ── File Upload ────────────────────────────────────────────
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
-
 dropZone.addEventListener('click', () => fileInput.click());
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault(); dropZone.classList.remove('drag-over');
-  uploadFiles(e.dataTransfer.files);
-});
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); uploadFiles(e.dataTransfer.files); });
 fileInput.addEventListener('change', () => uploadFiles(fileInput.files));
 
 async function uploadFiles(fileList) {
@@ -195,16 +179,11 @@ async function uploadFiles(fileList) {
   try {
     const res = await fetch('/api/upload', { method: 'POST', body: form });
     const data = await res.json();
-    if (data.files) {
-      uploadedFiles.push(...data.files);
-      renderFileList();
-    }
+    if (data.files) { uploadedFiles.push(...data.files); renderFileList(); }
   } catch (err) { addLog('Upload error: ' + err.message); }
 }
-
 function renderFileList() {
-  const el = document.getElementById('fileList');
-  el.innerHTML = uploadedFiles.map(f =>
+  document.getElementById('fileList').innerHTML = uploadedFiles.map(f =>
     `<div class="file-item"><span class="name">${esc(f.name)}</span><span class="size">${fmtSize(f.size)}</span></div>`
   ).join('');
 }
@@ -215,54 +194,30 @@ async function runIngest() {
   btn.disabled = true;
   document.getElementById('progressBar').style.display = 'block';
   document.getElementById('logArea').innerHTML = '';
-
   try {
-    await fetch('/api/ingest', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rawText: document.getElementById('rawText').value || '' }),
-    });
+    await fetch('/api/ingest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rawText: document.getElementById('rawText').value || '' }) });
     startPolling();
   } catch (err) { addLog('Error: ' + err.message); btn.disabled = false; }
 }
-
 function startPolling() {
   if (pollingId) return;
   pollingId = setInterval(async () => {
     try {
       const res = await fetch('/api/status');
       const data = await res.json();
-
-      // Status badge
       const badge = document.getElementById('statusBadge');
-      badge.textContent = data.status;
-      badge.className = 'status ' + data.status;
-
-      // Progress
-      if (data.progress.total > 0) {
-        const pct = Math.round((data.progress.current / data.progress.total) * 100);
-        document.getElementById('progressFill').style.width = pct + '%';
-      }
-
-      // Logs
+      badge.textContent = data.status; badge.className = 'status ' + data.status;
+      if (data.progress.total > 0) document.getElementById('progressFill').style.width = Math.round((data.progress.current / data.progress.total) * 100) + '%';
       const logEl = document.getElementById('logArea');
       logEl.innerHTML = data.logs.map(l => `<div class="log-line">${esc(l.msg)}</div>`).join('');
       logEl.scrollTop = logEl.scrollHeight;
-
-      if (data.status === 'done' || data.status === 'error') {
-        clearInterval(pollingId);
-        pollingId = null;
-        document.getElementById('runBtn').disabled = false;
-        if (data.status === 'done') refreshGraph();
-      }
-    } catch { /* retry */ }
+      if (data.status === 'done' || data.status === 'error') { clearInterval(pollingId); pollingId = null; document.getElementById('runBtn').disabled = false; if (data.status === 'done') refreshGraph(); }
+    } catch {}
   }, 500);
 }
-
 async function clearAll() {
   await fetch('/api/clear', { method: 'POST' });
-  uploadedFiles = [];
-  renderFileList();
+  uploadedFiles = []; renderFileList();
   document.getElementById('rawText').value = '';
   document.getElementById('logArea').innerHTML = '';
   document.getElementById('progressBar').style.display = 'none';
@@ -270,56 +225,54 @@ async function clearAll() {
   document.getElementById('statusBadge').className = 'status';
 }
 
-// ── Graph Visualization (force-directed) ───────────────────
+// ── Graph Visualization ────────────────────────────────────
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const tooltip = document.getElementById('tooltip');
-
 let transform = { x: 0, y: 0, scale: 1 };
-let dragging = null;
-let panning = false;
-let panStart = { x: 0, y: 0 };
-let hoveredNode = null;
-let animId = null;
-let settled = false;
+let dragging = null, panning = false, panStart = { x: 0, y: 0 };
+let hoveredNode = null, animId = null, settled = false;
 
 function resizeCanvas() {
   const r = canvas.parentElement.getBoundingClientRect();
-  canvas.width = r.width * devicePixelRatio;
-  canvas.height = r.height * devicePixelRatio;
-  canvas.style.width = r.width + 'px';
-  canvas.style.height = r.height + 'px';
+  canvas.width = r.width * devicePixelRatio; canvas.height = r.height * devicePixelRatio;
+  canvas.style.width = r.width + 'px'; canvas.style.height = r.height + 'px';
   ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
 }
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
+window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
 async function refreshGraph() {
   try {
     const res = await fetch('/api/graph');
     graphData = await res.json();
-    buildSimulation();
-    renderFilters();
-    updateStats();
+    buildSimulation(); renderFilters(); updateStats();
   } catch (err) { addLog('Graph load error: ' + err.message); }
 }
 
 function buildSimulation() {
-  const W = canvas.width / devicePixelRatio;
-  const H = canvas.height / devicePixelRatio;
-
-  // Build node map
+  const W = canvas.width / devicePixelRatio, H = canvas.height / devicePixelRatio;
   const nodeMap = new Map();
+
+  // Count edges per node for sizing
+  const edgeCounts = {};
+  for (const e of graphData.edges) {
+    edgeCounts[e.source] = (edgeCounts[e.source] || 0) + 1;
+    edgeCounts[e.target] = (edgeCounts[e.target] || 0) + 1;
+  }
+
   simNodes = graphData.nodes
     .filter(n => activeFilters.has(n.type))
     .map(n => {
+      const baseR = TYPE_RADIUS[n.type] || 5;
+      const connectivity = edgeCounts[n.id] || 0;
       const sn = {
         id: n.id, type: n.type, name: n.name || n.text || n.filename || n.id,
         aliases: n.aliases, role: n.role, entityType: n.entityType, mentions: n.mentions,
+        text: n.text, path: n.path, filename: n.filename,
         x: W/2 + (Math.random() - 0.5) * W * 0.6,
         y: H/2 + (Math.random() - 0.5) * H * 0.6,
         vx: 0, vy: 0,
-        r: TYPE_RADIUS[n.type] || 5,
+        r: baseR + Math.min(6, Math.sqrt(connectivity) * 1.5),
+        raw: n,
       };
       nodeMap.set(n.id, sn);
       return sn;
@@ -335,120 +288,99 @@ function buildSimulation() {
 
 function simulate() {
   if (settled) return;
-  const alpha = 0.3;
-  const repulsion = 800;
-  const attraction = 0.005;
-  const centerPull = 0.01;
-  const damping = 0.85;
-  const W = canvas.width / devicePixelRatio;
-  const H = canvas.height / devicePixelRatio;
+  const W = canvas.width / devicePixelRatio, H = canvas.height / devicePixelRatio;
 
-  // Repulsion (Barnes-Hut would be better but O(n^2) is fine for <500 nodes)
   for (let i = 0; i < simNodes.length; i++) {
     for (let j = i + 1; j < simNodes.length; j++) {
       const a = simNodes[i], b = simNodes[j];
       let dx = b.x - a.x, dy = b.y - a.y;
       let dist = Math.sqrt(dx*dx + dy*dy) || 1;
-      const force = repulsion / (dist * dist);
-      const fx = (dx / dist) * force;
-      const fy = (dy / dist) * force;
-      a.vx -= fx; a.vy -= fy;
-      b.vx += fx; b.vy += fy;
+      const force = 800 / (dist * dist);
+      const fx = (dx / dist) * force, fy = (dy / dist) * force;
+      a.vx -= fx; a.vy -= fy; b.vx += fx; b.vy += fy;
     }
   }
-
-  // Attraction (edges)
   for (const e of simEdges) {
-    const dx = e.target.x - e.source.x;
-    const dy = e.target.y - e.source.y;
+    const dx = e.target.x - e.source.x, dy = e.target.y - e.source.y;
     const dist = Math.sqrt(dx*dx + dy*dy) || 1;
-    const force = dist * attraction;
-    const fx = (dx / dist) * force;
-    const fy = (dy / dist) * force;
-    e.source.vx += fx; e.source.vy += fy;
-    e.target.vx -= fx; e.target.vy -= fy;
+    // Stronger attraction for non-FROM_SOURCE edges
+    const strength = e.type === 'FROM_SOURCE' ? 0.001 : 0.008;
+    const fx = (dx / dist) * dist * strength, fy = (dy / dist) * dist * strength;
+    e.source.vx += fx; e.source.vy += fy; e.target.vx -= fx; e.target.vy -= fy;
   }
-
-  // Center pull + integrate
-  let totalMovement = 0;
+  let totalMove = 0;
   for (const n of simNodes) {
     if (n === dragging) continue;
-    n.vx += (W/2 - n.x) * centerPull;
-    n.vy += (H/2 - n.y) * centerPull;
-    n.vx *= damping;
-    n.vy *= damping;
-    n.x += n.vx * alpha;
-    n.y += n.vy * alpha;
-    totalMovement += Math.abs(n.vx) + Math.abs(n.vy);
+    n.vx += (W/2 - n.x) * 0.008; n.vy += (H/2 - n.y) * 0.008;
+    n.vx *= 0.85; n.vy *= 0.85;
+    n.x += n.vx * 0.3; n.y += n.vy * 0.3;
+    totalMove += Math.abs(n.vx) + Math.abs(n.vy);
   }
-
-  if (totalMovement / simNodes.length < 0.05) settled = true;
+  if (totalMove / (simNodes.length || 1) < 0.05) settled = true;
 }
 
 function draw() {
-  const W = canvas.width / devicePixelRatio;
-  const H = canvas.height / devicePixelRatio;
+  const W = canvas.width / devicePixelRatio, H = canvas.height / devicePixelRatio;
   ctx.clearRect(0, 0, W, H);
   ctx.save();
   ctx.translate(transform.x, transform.y);
   ctx.scale(transform.scale, transform.scale);
 
   // Edges
-  ctx.lineWidth = 0.5;
   for (const e of simEdges) {
+    const isFromSource = e.type === 'FROM_SOURCE' || e.type === 'ABOUT';
+    const isHighlighted = selectedNode && (e.source.id === selectedNode.id || e.target.id === selectedNode.id);
     ctx.beginPath();
-    ctx.strokeStyle = 'rgba(48,54,61,0.6)';
-    ctx.moveTo(e.source.x, e.source.y);
-    ctx.lineTo(e.target.x, e.target.y);
+    ctx.strokeStyle = isHighlighted ? 'rgba(88,166,255,0.6)' : isFromSource ? 'rgba(48,54,61,0.3)' : 'rgba(88,166,255,0.2)';
+    ctx.lineWidth = isHighlighted ? 1.5 : isFromSource ? 0.3 : 0.8;
+    ctx.moveTo(e.source.x, e.source.y); ctx.lineTo(e.target.x, e.target.y);
     ctx.stroke();
+    // Edge labels for highlighted edges
+    if (isHighlighted && e.type && transform.scale > 0.6) {
+      const mx = (e.source.x + e.target.x) / 2, my = (e.source.y + e.target.y) / 2;
+      ctx.font = '8px -apple-system, sans-serif';
+      ctx.fillStyle = 'rgba(88,166,255,0.7)';
+      ctx.textAlign = 'center';
+      ctx.fillText(e.type, mx, my - 3);
+    }
   }
 
   // Nodes
   for (const n of simNodes) {
     const color = TYPE_COLORS[n.type] || '#8b949e';
     const isHovered = n === hoveredNode;
+    const isSelected = n === selectedNode;
+    const isConnected = selectedNode && simEdges.some(e => (e.source.id === selectedNode.id && e.target.id === n.id) || (e.target.id === selectedNode.id && e.source.id === n.id));
+    const dimmed = selectedNode && !isSelected && !isConnected;
 
     ctx.beginPath();
-    ctx.arc(n.x, n.y, n.r * (isHovered ? 1.5 : 1), 0, Math.PI * 2);
-    ctx.fillStyle = isHovered ? color : color + 'cc';
+    ctx.arc(n.x, n.y, n.r * (isHovered || isSelected ? 1.3 : 1), 0, Math.PI * 2);
+    ctx.fillStyle = dimmed ? color + '33' : (isHovered || isSelected) ? color : color + 'bb';
     ctx.fill();
 
-    if (isHovered) {
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-    }
+    if (isSelected) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke(); }
+    else if (isHovered) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke(); }
 
-    // Labels for larger nodes or hovered
-    if (n.r >= 6 || isHovered || transform.scale > 1.5) {
-      const label = (n.name || n.id).slice(0, 30);
-      ctx.font = `${isHovered ? 11 : 9}px -apple-system, sans-serif`;
-      ctx.fillStyle = isHovered ? '#fff' : 'rgba(230,237,243,0.7)';
+    if ((n.r >= 7 || isHovered || isSelected || isConnected) && !dimmed && transform.scale > 0.4) {
+      const label = (n.name || n.id).replace(/^[a-z]+:/, '').slice(0, 25);
+      ctx.font = `${isSelected ? 11 : isHovered ? 10 : 9}px -apple-system, sans-serif`;
+      ctx.fillStyle = dimmed ? 'rgba(230,237,243,0.2)' : (isSelected || isHovered) ? '#fff' : 'rgba(230,237,243,0.6)';
       ctx.textAlign = 'center';
       ctx.fillText(label, n.x, n.y + n.r + 12);
     }
   }
-
   ctx.restore();
 }
 
-function animate() {
-  simulate();
-  draw();
-  animId = requestAnimationFrame(animate);
-}
+function animate() { simulate(); draw(); animId = requestAnimationFrame(animate); }
 
 // ── Interaction ────────────────────────────────────────────
-function screenToWorld(sx, sy) {
-  return { x: (sx - transform.x) / transform.scale, y: (sy - transform.y) / transform.scale };
-}
-
+function screenToWorld(sx, sy) { return { x: (sx - transform.x) / transform.scale, y: (sy - transform.y) / transform.scale }; }
 function findNode(sx, sy) {
   const { x, y } = screenToWorld(sx, sy);
   for (let i = simNodes.length - 1; i >= 0; i--) {
-    const n = simNodes[i];
-    const dx = n.x - x, dy = n.y - y;
-    if (dx*dx + dy*dy < (n.r + 4) * (n.r + 4)) return n;
+    const n = simNodes[i], dx = n.x - x, dy = n.y - y;
+    if (dx*dx + dy*dy < (n.r + 5) * (n.r + 5)) return n;
   }
   return null;
 }
@@ -457,51 +389,32 @@ canvas.addEventListener('mousedown', e => {
   const rect = canvas.getBoundingClientRect();
   const sx = e.clientX - rect.left, sy = e.clientY - rect.top;
   const node = findNode(sx, sy);
-  if (node) {
-    dragging = node;
-    settled = false;
-  } else {
-    panning = true;
-    panStart = { x: e.clientX - transform.x, y: e.clientY - transform.y };
-  }
+  if (node) { dragging = node; settled = false; }
+  else { panning = true; panStart = { x: e.clientX - transform.x, y: e.clientY - transform.y }; }
 });
 
 canvas.addEventListener('mousemove', e => {
   const rect = canvas.getBoundingClientRect();
   const sx = e.clientX - rect.left, sy = e.clientY - rect.top;
-
-  if (dragging) {
-    const { x, y } = screenToWorld(sx, sy);
-    dragging.x = x; dragging.y = y;
-    dragging.vx = 0; dragging.vy = 0;
-    settled = false;
-  } else if (panning) {
-    transform.x = e.clientX - panStart.x;
-    transform.y = e.clientY - panStart.y;
-  } else {
-    const node = findNode(sx, sy);
-    hoveredNode = node;
-    canvas.style.cursor = node ? 'pointer' : 'grab';
-
-    if (node) {
-      const tt = document.getElementById('tooltip');
-      tt.style.display = 'block';
-      tt.style.left = (e.clientX - canvas.parentElement.getBoundingClientRect().left + 12) + 'px';
-      tt.style.top = (e.clientY - canvas.parentElement.getBoundingClientRect().top - 10) + 'px';
-      let detail = '';
-      if (node.aliases?.length) detail += `Aliases: ${node.aliases.join(', ')}\n`;
-      if (node.role) detail += `Role: ${node.role}\n`;
-      if (node.entityType) detail += `Category: ${node.entityType}\n`;
-      if (node.mentions > 1) detail += `Mentions: ${node.mentions}`;
-      tt.innerHTML = `<div class="tt-type">${esc(node.type)}</div><div class="tt-name">${esc(node.name || node.id)}</div>${detail ? `<div class="tt-detail">${esc(detail.trim())}</div>` : ''}`;
-    } else {
-      tooltip.style.display = 'none';
-    }
-  }
+  if (dragging) { const { x, y } = screenToWorld(sx, sy); dragging.x = x; dragging.y = y; dragging.vx = 0; dragging.vy = 0; settled = false; }
+  else if (panning) { transform.x = e.clientX - panStart.x; transform.y = e.clientY - panStart.y; }
+  else { hoveredNode = findNode(sx, sy); canvas.style.cursor = hoveredNode ? 'pointer' : 'grab'; }
 });
 
-canvas.addEventListener('mouseup', () => { dragging = null; panning = false; });
-canvas.addEventListener('mouseleave', () => { dragging = null; panning = false; tooltip.style.display = 'none'; hoveredNode = null; });
+canvas.addEventListener('mouseup', e => {
+  if (dragging && !panning) {
+    // If we barely moved, treat as click
+    selectNode(dragging);
+  }
+  dragging = null; panning = false;
+});
+canvas.addEventListener('mouseleave', () => { dragging = null; panning = false; hoveredNode = null; });
+
+canvas.addEventListener('click', e => {
+  const rect = canvas.getBoundingClientRect();
+  const node = findNode(e.clientX - rect.left, e.clientY - rect.top);
+  selectNode(node);
+});
 
 canvas.addEventListener('wheel', e => {
   e.preventDefault();
@@ -514,51 +427,126 @@ canvas.addEventListener('wheel', e => {
   transform.scale = newScale;
 }, { passive: false });
 
-function resetView() {
-  transform = { x: 0, y: 0, scale: 1 };
-  settled = false;
+function resetView() { transform = { x: 0, y: 0, scale: 1 }; selectedNode = null; showDetail(null); settled = false; }
+
+// ── Node Selection & Detail Panel ──────────────────────────
+function selectNode(node) {
+  selectedNode = node;
+  settled = false; // redraw
+  showDetail(node);
+}
+
+function showDetail(node) {
+  const panel = document.getElementById('detailPanel');
+  const content = document.getElementById('detailContent');
+
+  if (!node) {
+    panel.classList.add('collapsed');
+    return;
+  }
+
+  panel.classList.remove('collapsed');
+  resizeCanvas();
+
+  const color = TYPE_COLORS[node.type] || '#8b949e';
+  const name = node.name || node.id;
+
+  // Find all edges for this node
+  const edges = graphData.edges.filter(e => e.source === node.id || e.target === node.id);
+
+  // Group edges: outgoing vs incoming
+  const outgoing = edges.filter(e => e.source === node.id).map(e => {
+    const target = graphData.nodes.find(n => n.id === e.target);
+    return { type: e.type, nodeId: e.target, name: target?.name || target?.text || target?.filename || e.target, nodeType: target?.type };
+  });
+  const incoming = edges.filter(e => e.target === node.id).map(e => {
+    const source = graphData.nodes.find(n => n.id === e.source);
+    return { type: e.type, nodeId: e.source, name: source?.name || source?.text || source?.filename || e.source, nodeType: source?.type };
+  });
+
+  let html = '';
+
+  // Header
+  html += `<div class="detail-header">`;
+  html += `<div class="type-badge" style="background:${color}22;color:${color}">${esc(node.type)}${node.entityType ? ' / ' + esc(node.entityType) : ''}</div>`;
+  html += `<div class="node-name">${esc(name)}</div>`;
+  const meta = [];
+  if (node.mentions > 1) meta.push(`${node.mentions} mentions`);
+  if (node.role) meta.push(`Role: ${node.role}`);
+  if (node.filename) meta.push(node.filename);
+  if (meta.length) html += `<div class="node-meta">${esc(meta.join(' · '))}</div>`;
+  if (node.aliases?.length) html += `<div class="detail-aliases" style="margin-top:4px">aka: ${esc(node.aliases.join(', '))}</div>`;
+  html += `</div>`;
+
+  // Text content (for facts, decisions, etc.)
+  if (node.text || node.raw?.text || node.raw?.summary) {
+    html += `<div class="detail-section"><div class="detail-text">${esc(node.text || node.raw?.text || node.raw?.summary)}</div></div>`;
+  }
+
+  // Connections
+  if (outgoing.length > 0 || incoming.length > 0) {
+    html += `<div class="detail-section"><h3>Connections (${outgoing.length + incoming.length})</h3>`;
+
+    for (const e of outgoing) {
+      const tc = TYPE_COLORS[e.nodeType] || '#8b949e';
+      html += `<div class="edge-item" onclick="navigateTo('${esc(e.nodeId)}')">`;
+      html += `<span class="edge-dir" style="color:${tc}">&#x2192;</span>`;
+      html += `<span class="edge-type">${esc(e.type)}</span>`;
+      html += `<span class="edge-target" style="color:${tc}">${esc(e.name)}</span>`;
+      html += `</div>`;
+    }
+    for (const e of incoming) {
+      const tc = TYPE_COLORS[e.nodeType] || '#8b949e';
+      html += `<div class="edge-item" onclick="navigateTo('${esc(e.nodeId)}')">`;
+      html += `<span class="edge-dir" style="color:${tc}">&#x2190;</span>`;
+      html += `<span class="edge-type">${esc(e.type)}</span>`;
+      html += `<span class="edge-target" style="color:${tc}">${esc(e.name)}</span>`;
+      html += `</div>`;
+    }
+    html += `</div>`;
+  }
+
+  content.innerHTML = html;
+}
+
+function navigateTo(nodeId) {
+  const node = simNodes.find(n => n.id === nodeId);
+  if (node) {
+    selectNode(node);
+    // Center view on node
+    const W = canvas.width / devicePixelRatio, H = canvas.height / devicePixelRatio;
+    transform.x = W/2 - node.x * transform.scale;
+    transform.y = H/2 - node.y * transform.scale;
+  }
 }
 
 // ── Filters ────────────────────────────────────────────────
 function renderFilters() {
   const types = new Set(graphData.nodes.map(n => n.type));
-  const bar = document.getElementById('filterBar');
-  bar.innerHTML = [...types].sort().map(t => {
+  document.getElementById('filterBar').innerHTML = [...types].sort().map(t => {
     const active = activeFilters.has(t);
     const color = TYPE_COLORS[t] || '#8b949e';
     return `<span class="filter-chip ${active ? 'active' : ''}" style="${active ? `border-color:${color};color:${color}` : ''}" onclick="toggleFilter('${t}')">${t}</span>`;
   }).join('');
-
-  // Legend
-  const legend = document.getElementById('legend');
-  legend.innerHTML = [...types].sort().filter(t => activeFilters.has(t)).map(t =>
+  document.getElementById('legend').innerHTML = [...types].sort().filter(t => activeFilters.has(t)).map(t =>
     `<span class="legend-item"><span class="legend-dot" style="background:${TYPE_COLORS[t] || '#8b949e'}"></span>${t}</span>`
   ).join('');
 }
-
 function toggleFilter(type) {
-  if (activeFilters.has(type)) activeFilters.delete(type);
-  else activeFilters.add(type);
-  buildSimulation();
-  renderFilters();
+  if (activeFilters.has(type)) activeFilters.delete(type); else activeFilters.add(type);
+  buildSimulation(); renderFilters();
 }
-
 function updateStats() {
-  const n = graphData.nodes.length;
-  const e = graphData.edges.length;
+  const n = graphData.nodes.length, e = graphData.edges.length;
   document.getElementById('statsBar').textContent = `${n} nodes, ${e} edges`;
 }
 
 // ── Helpers ────────────────────────────────────────────────
-function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function fmtSize(b) { return b < 1024 ? b + ' B' : b < 1048576 ? (b/1024).toFixed(1) + ' KB' : (b/1048576).toFixed(1) + ' MB'; }
-function addLog(msg) {
-  const el = document.getElementById('logArea');
-  el.innerHTML += `<div class="log-line">${esc(msg)}</div>`;
-  el.scrollTop = el.scrollHeight;
-}
+function addLog(msg) { const el = document.getElementById('logArea'); el.innerHTML += `<div class="log-line">${esc(msg)}</div>`; el.scrollTop = el.scrollHeight; }
 
-// ── Init ───────────────────────────────────────────────────
+// Init
 refreshGraph();
 </script>
 </body>
