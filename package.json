@@ -1,0 +1,10 @@
+{
+  "name": "betteringest",
+  "version": "0.1.0",
+  "description": "Bulk-ingest files into a MiniGraph knowledge graph",
+  "type": "module",
+  "bin": {
+    "betteringest": "./bin/betteringest"
+  },
+  "license": "MIT"
+}

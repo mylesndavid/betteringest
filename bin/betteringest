@@ -1,0 +1,203 @@
+#!/usr/bin/env node
+
+/**
+ * betteringest — Bulk-ingest files into a MiniGraph knowledge graph.
+ */
+import { resolve } from 'node:path';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { resolveConfig } from '../lib/config.js';
+import { ingest } from '../lib/ingest.js';
+import { MiniGraph } from '../lib/graph.js';
+
+const USAGE = `
+  betteringest — Knowledge Graph Ingestion CLI
+
+  Usage:
+    betteringest <sources...> [options]     Ingest files/dirs into a knowledge graph
+    betteringest --stdin [options]           Ingest from stdin
+    betteringest stats <graph.json>          Show graph statistics
+    betteringest search <graph.json> <q>     Search the graph
+    betteringest merge <a.json> <b.json>     Merge two graphs
+    betteringest export <graph.json> --dot   Export as DOT for Graphviz
+    betteringest ui [options]                Web UI on port 3335
+
+  Options:
+    -o, --output <path>      Output graph file (default: ./graph.json)
+    -k, --api-key <key>      API key (or OPENROUTER_API_KEY env var)
+    -m, --model <model>      Model (default: google/gemini-2.0-flash-lite-001)
+    -p, --provider <name>    Provider: openrouter, openai, groq, ollama
+    --base-url <url>         Custom API base URL
+    --max-concurrent <n>     Parallel LLM calls (default: 3)
+    --chunk-size <tokens>    Max tokens per chunk (default: 6000)
+    --yes                    Skip cost confirmation
+    --dry-run                Estimate cost and exit
+    --verbose                Show per-chunk extraction details
+    -h, --help               Show this help
+`;
+
+// ── Arg parsing ──────────────────────────────────────────────
+function parseArgs(argv) {
+  const args = { sources: [], flags: {} };
+  let i = 0;
+  while (i < argv.length) {
+    const a = argv[i];
+    if (a === '-h' || a === '--help') { args.flags.help = true; }
+    else if (a === '--stdin') { args.flags.stdin = true; }
+    else if (a === '--yes' || a === '-y') { args.flags.yes = true; }
+    else if (a === '--dry-run') { args.flags.dryRun = true; }
+    else if (a === '--verbose' || a === '-v') { args.flags.verbose = true; }
+    else if (a === '--dot') { args.flags.dot = true; }
+    else if ((a === '-o' || a === '--output') && argv[i + 1]) { args.flags.output = argv[++i]; }
+    else if ((a === '-k' || a === '--api-key') && argv[i + 1]) { args.flags.apiKey = argv[++i]; }
+    else if ((a === '-m' || a === '--model') && argv[i + 1]) { args.flags.model = argv[++i]; }
+    else if ((a === '-p' || a === '--provider') && argv[i + 1]) { args.flags.provider = argv[++i]; }
+    else if (a === '--base-url' && argv[i + 1]) { args.flags.baseUrl = argv[++i]; }
+    else if (a === '--max-concurrent' && argv[i + 1]) { args.flags.maxConcurrent = argv[++i]; }
+    else if (a === '--chunk-size' && argv[i + 1]) { args.flags.chunkSize = argv[++i]; }
+    else if (!a.startsWith('-')) { args.sources.push(a); }
+    i++;
+  }
+  return args;
+}
+
+function loadGraph(path) {
+  const raw = readFileSync(resolve(path), 'utf-8');
+  return MiniGraph.import(JSON.parse(raw));
+}
+
+// ── Subcommands ──────────────────────────────────────────────
+
+function cmdStats(graphPath) {
+  const graph = loadGraph(graphPath);
+  const data = graph.export();
+
+  const typeCounts = {};
+  for (const node of data.nodes) {
+    const t = node.type || 'unknown';
+    typeCounts[t] = (typeCounts[t] || 0) + 1;
+  }
+
+  const edgeTypeCounts = {};
+  for (const edge of data.edges) {
+    const t = edge.type || 'unknown';
+    edgeTypeCounts[t] = (edgeTypeCounts[t] || 0) + 1;
+  }
+
+  console.log(`\n  Graph: ${graphPath}`);
+  console.log(`  Nodes: ${data.nodes.length}`);
+  console.log(`  Edges: ${data.edges.length}\n`);
+
+  console.log('  Node types:');
+  for (const [type, count] of Object.entries(typeCounts).sort((a, b) => b[1] - a[1])) {
+    console.log(`    ${type.padEnd(15)} ${count}`);
+  }
+
+  console.log('\n  Edge types:');
+  for (const [type, count] of Object.entries(edgeTypeCounts).sort((a, b) => b[1] - a[1])) {
+    console.log(`    ${type.padEnd(15)} ${count}`);
+  }
+  console.log();
+}
+
+function cmdSearch(graphPath, query) {
+  const graph = loadGraph(graphPath);
+  const results = graph.search(query);
+
+  if (results.length === 0) {
+    console.log('  No results.');
+    return;
+  }
+
+  console.log(`\n  Results for "${query}":\n`);
+  for (const r of results.slice(0, 10)) {
+    const a = r.attrs;
+    const label = a.name || a.text || a.summary || a.path || r.id;
+    const type = a.type || 'unknown';
+    console.log(`  [${r.score.toFixed(2)}] ${type}: ${label}`);
+    if (a.aliases?.length) console.log(`         aka: ${a.aliases.join(', ')}`);
+  }
+  console.log();
+}
+
+function cmdMerge(pathA, pathB, outputPath) {
+  const graphA = loadGraph(pathA);
+  const graphB = loadGraph(pathB);
+
+  // Merge B into A
+  const dataB = graphB.export();
+  for (const node of dataB.nodes) {
+    const { id, ...attrs } = node;
+    graphA.mergeNode(id, attrs);
+  }
+  for (const edge of dataB.edges) {
+    const { source, target, ...attrs } = edge;
+    graphA.addEdge(source, target, attrs);
+  }
+
+  const out = outputPath || 'merged.json';
+  writeFileSync(resolve(out), JSON.stringify(graphA.export(), null, 2));
+
+  const stats = graphA.export();
+  console.log(`  Merged: ${stats.nodes.length} nodes, ${stats.edges.length} edges → ${out}`);
+}
+
+function cmdExport(graphPath, flags) {
+  const graph = loadGraph(graphPath);
+  const data = graph.export();
+
+  if (flags.dot) {
+    const lines = ['digraph G {', '  rankdir=LR;', '  node [shape=box, fontsize=10];'];
+
+    for (const node of data.nodes) {
+      const label = (node.name || node.text || node.path || node.id).replace(/"/g, '\\"').slice(0, 50);
+      const color = {
+        entity: 'lightblue', person: 'lightyellow', fact: 'lightgreen',
+        decision: 'lightsalmon', document: 'lightgray', preference: 'lavender',
+        frustration: 'mistyrose',
+      }[node.type] || 'white';
+      lines.push(`  "${node.id}" [label="${label}", style=filled, fillcolor="${color}"];`);
+    }
+
+    for (const edge of data.edges) {
+      const label = edge.type || '';
+      lines.push(`  "${edge.source}" -> "${edge.target}" [label="${label}", fontsize=8];`);
+    }
+
+    lines.push('}');
+    console.log(lines.join('\n'));
+  }
+}
+
+// ── Main ─────────────────────────────────────────────────────
+
+const { sources, flags } = parseArgs(process.argv.slice(2));
+
+if (flags.help || (sources.length === 0 && !flags.stdin)) {
+  const cmd = sources[0];
+  if (cmd === 'stats' || cmd === 'search' || cmd === 'merge' || cmd === 'export' || cmd === 'ui') {
+    // Fall through to subcommand handling
+  } else {
+    console.log(USAGE);
+    process.exit(0);
+  }
+}
+
+const cmd = sources[0];
+
+if (cmd === 'ui') {
+  const { startServer } = await import('../lib/server.js');
+  await startServer(flags);
+} else if (cmd === 'stats' && sources[1]) {
+  cmdStats(sources[1]);
+} else if (cmd === 'search' && sources[1] && sources[2]) {
+  cmdSearch(sources[1], sources.slice(2).join(' '));
+} else if (cmd === 'merge' && sources[1] && sources[2]) {
+  cmdMerge(sources[1], sources[2], flags.output);
+} else if (cmd === 'export' && sources[1]) {
+  cmdExport(sources[1], flags);
+} else {
+  // Default: ingest mode
+  const config = resolveConfig(flags);
+  const ingestSources = flags.stdin ? [] : sources.map(s => resolve(s));
+  await ingest(ingestSources, config);
+}
